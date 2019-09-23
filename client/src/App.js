@@ -17,14 +17,10 @@ class App extends Component {
     userData2: [],
     userLabels: [],
     dataFormat: 'weekly',
-    maxVal: '',
     avgCommits: '',
 
     userLegend: []
 
-    // Multiple Users
-    // user1: '',
-    // user2: ''
   }
 
   handleInputChange = event => {
@@ -141,25 +137,9 @@ class App extends Component {
 
 
           {/* Here we want to add more inputs based on the numUsers state */}
-          {/* {this.state.numUsers.length > 1 ? '' : ''} */}
-          {/* {inputs} */}
 
         </div>
         <button className='btn' onClick={this.multSubmit}>Submit</button><button className='btn' onClick={this.addUser}>Add User</button>
-
-
-        {/* User vs User */}
-        <div className='row'>
-          <div className='input-field col s6 '>
-            <input id='user1' name='user1' value={this.state.user1} onChange={this.handleInputChange} type='text' className='validate'></input>
-            <label htmlFor='user1'>User1</label>
-          </div>
-          <div className='input-field col s6'>
-            <input id='user2' name='user2' value={this.state.user2} onChange={this.handleInputChange} type='text' className='validate'></input>
-            <label htmlFor='user2'>User2</label>
-          </div>
-        </div>
-        <button className='btn' onClick={this.multSubmit}>Submit</button>
 
         {this.state.userData2.length ?
           <div>
