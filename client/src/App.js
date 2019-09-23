@@ -1,52 +1,30 @@
 import React, { Component } from 'react';
 
-import { VictoryLine, VictoryChart, VictoryTheme } from 'victory';
-import XYFrame from "semiotic/lib/XYFrame";
-import { scaleTime } from 'd3-scale';
+// Victory
+// import * as V from 'victory';
+import { VictoryChart, VictoryLine, VictoryTheme, VictoryVoronoiContainer, VictoryLegend } from 'victory';
 
-import API from './Utils/API'
-
-
-const theme = ["#ac58e5", "#E0488B", "#9fd0cb", "#e0d33a", "#7566ff", "#533f82", "#7a255d", "#365350", "#a19a11", "#3f4482"];
-const frameProps = {
-  /* --- Data --- */
-  lines: [{
-    title: "Activity", coordinates: [{ week: 1, grossWeekly: 327616, theaterCount: 4, theaterAvg: 81904, date: "2015-04-10", rank: 18 },
-    { week: 2, grossWeekly: 1150814, theaterCount: 39, theaterAvg: 29508, date: "2015-04-17", rank: 15 }]
-  }],
-
-  /* --- Size --- */
-  size: [900, 600],
-  margin: { left: 80, bottom: 90, right: 10, top: 40 },
-
-  /* --- Process --- */
-  xAccessor: "week",
-  yAccessor: "theaterCount",
-  yExtent: [0],
-
-  /* --- Customize --- */
-  lineStyle: (d, i) => ({
-    stroke: theme[i],
-    strokeWidth: 2,
-    fill: "none"
-  }),
-  title: (
-    <text textAnchor="middle">
-      Theaters showing <tspan fill={"#ac58e5"}>Ex Machina</tspan> vs{" "}
-      <tspan fill={"#E0488B"}>Far from the Madding Crowd</tspan>
-    </text>
-  ),
-  axes: [{ orient: "left", label: "Number of Theaters", tickFormat: function (e) { return e / 1e3 + "k" } },
-  { orient: "bottom", label: { name: "Weeks from Opening Day", locationDistance: 55 } }]
-};
-
-
+// import moment, { duration } from 'moment';
+import API from './Utils/API';
+import NewInput from './Components/NewInput';
 
 class App extends Component {
   state = {
-    user: '',
-    userData: [],
-    dataFormat: 'weekly'
+    // users: [],
+    numUsers: ['user'],
+    // user: '',
+    // userData: [],
+    userData2: [],
+    userLabels: [],
+    dataFormat: 'weekly',
+    maxVal: '',
+    avgCommits: '',
+
+    userLegend: []
+
+    // Multiple Users
+    // user1: '',
+    // user2: ''
   }
 
   handleInputChange = event => {
@@ -56,76 +34,169 @@ class App extends Component {
     });
   }
 
-  handleFormatChange = () => {
+  // handleSubmit = event => {
+  //   event.preventDefault();
+  //   console.log(this.state.user)
+  //   API.getInfo(this.state.user)
+  //     .then(res => {
 
-  }
+  //       // We want to set the max y value by getting the greatest value of y in our array of objects
+  //       var sortedCount = res.data.monthly.sort((a, b) => (a.count > b.count) ? 1 : -1);
+  //       var xMax = sortedCount[sortedCount.length - 1].count
 
-  handleSubmit = event => {
+  //       // We want to set the max x value by getting the greatest value of y in our array of objects
+  //       var sortedDate = res.data.monthly.sort((a, b) => (a.date > b.date) ? 1 : -1);
+  //       var yMax = sortedDate[sortedDate.length - 1].date
+
+  //       // We want to get the Average commits for this month to date
+  //       console.log(moment().date())
+  //       var sum = 0;
+  //       for (let i = 0; i < res.data.monthly.length; i++) {
+  //         sum += res.data.monthly[i].count
+  //       }
+  //       console.log(sum)
+  //       var avgCommits = sum / moment().date()
+  //       console.log(`You made ${avgCommits} commits a day on average`)
+
+  //       let labelArr = res.data.monthly.map(x => `Sept.${x.date}, ${x.count} commits`)
+  //       console.log(labelArr)
+  //       this.setState({
+  //         userLabels: labelArr,
+  //         userData: res.data.monthly,
+  //         xMax: xMax,
+  //         yMax: yMax,
+  //         avgCommits: avgCommits
+  //         // avgCommits: avgCommits
+  //       })
+
+  //       console.log(this.state.userData)
+
+  //     })
+  // }
+
+  multSubmit = event => {
+
     event.preventDefault();
-    API.getInfo(this.state.user)
+    let userArr = document.getElementsByClassName("user")
+    let names = [];
+    for (let i = 0; i < userArr.length; i++) {
+      names.push(userArr[i].value)
+    }
+
+    let data = {
+      users: names
+    }
+
+    console.log(data)
+    API.getUsers(data)
       .then(res => {
-        console.log(`List of Contributions per year`)
-        // console.log(res.data.monthly)
-
+        console.log(res.data.users)
+        let legend = [];
+        for (let i = 0; i < res.data.users.length; i++) {
+          console.log(res.data.users[i].color)
+          console.log(res.data.users[i].author)
+          let entry = {
+            name: res.data.users[i].author,
+            symbol: { fill: res.data.users[i].color }
+          }
+          legend.push(entry)
+        }
         this.setState({
-          userData: res.data.monthly
+          userData2: res.data.users,
+          userLegend: legend
         })
-        console.log(this.state.userData)
-
       })
+
   }
 
+  addUser = () => {
+    let newArr = this.state.numUsers
+    newArr.push('user')
+    this.setState({
+      numUsers: newArr
+    })
+  }
 
   render() {
+
     return (
       <div className='container'>
-        <h1>This is a graph of my contributions this year</h1>
-        <div className='input-field col s6'>
-          <input id='user' name='user' value={this.state.user} onChange={this.handleInputChange} type='text' className='validate'></input>
-          <label htmlFor='user'>User</label>
+        <h4>Contribution Line Graph</h4>
+
+        {/* I want to have a plus button below this input to add additional users */}
+        <div className='input-section'>
+          {/* <div className='input-field col s6'>
+            <input id='user' name='user' value={this.state.user} onChange={this.handleInputChange} type='text' className='validate'></input>
+            <label htmlFor='user'>User</label>
+          </div> */}
+
+          {this.state.numUsers.length ?
+
+            this.state.numUsers.map((elm, i) => (
+              <NewInput
+                key={i}
+              />
+            ))
+            : ''}
+
+
+          {/* Here we want to add more inputs based on the numUsers state */}
+          {/* {this.state.numUsers.length > 1 ? '' : ''} */}
+          {/* {inputs} */}
+
         </div>
-        <button className='btn' onClick={this.handleSubmit}>Submit</button>
+        <button className='btn' onClick={this.multSubmit}>Submit</button><button className='btn' onClick={this.addUser}>Add User</button>
 
-        <h2>Victory</h2>
-        {this.state.userData.length !== 0 ?
-          <VictoryChart
-          // theme={VictoryTheme.material}
-          >
-            <VictoryLine
-              name='monthly'
-              interpolation='natural'
-              domain={{ x: [200, 220], y: [0, 50] }}
-              style={{
-                data: { stroke: '#c43a31' },
-                parent: { border: '0.5px solid #ccc' }
-              }}
-              data={this.state.userData}
-              x='date'
-              y='count'
-            />
-          </VictoryChart>
+
+        {/* User vs User */}
+        <div className='row'>
+          <div className='input-field col s6 '>
+            <input id='user1' name='user1' value={this.state.user1} onChange={this.handleInputChange} type='text' className='validate'></input>
+            <label htmlFor='user1'>User1</label>
+          </div>
+          <div className='input-field col s6'>
+            <input id='user2' name='user2' value={this.state.user2} onChange={this.handleInputChange} type='text' className='validate'></input>
+            <label htmlFor='user2'>User2</label>
+          </div>
+        </div>
+        <button className='btn' onClick={this.multSubmit}>Submit</button>
+
+        {this.state.userData2.length ?
+          <div>
+            <VictoryChart
+              height={300}
+              width={550}
+              domainPadding={{ y: 10 }}
+            >
+              <VictoryLegend
+                // x={30}
+                // y={30}
+                title='Legend'
+                centerTitle
+                orientation='horizontal'
+                gutter={20}
+                style={{ border: { stroke: 'black' }, title: { fontSize: 10 }, data: { fontSize: 10 } }}
+                data={this.state.userLegend}
+              />
+              {this.state.userData2.map(
+                (user, i) => (
+                  <VictoryLine
+                    interpolation='natural'
+                    name={user.author}
+                    key={i}
+                    data={user.monthly}
+                    style={{
+                      data: { stroke: user.color, strokeWidth: 0.8 }
+                    }}
+                    x='date'
+                    y='count'
+                  // data={user}
+                  />
+                )
+              )}
+            </VictoryChart>
+          </div>
           : ''}
-
-        {/* <h2>D3js</h2>
-        <svg></svg> */}
-
-        <h2>Semiotic</h2>
-        <XYFrame
-          title='Monthly Activity'
-          points={this.state.userData}
-          pointStyle={{ fill: 'blue' }}
-          xAccessor={'date'}
-          yAccessor={'count'}
-          xScaleType={scaleTime()}
-
-        // size={[800, 600]}
-        // xAccessor={'date'}
-        // yAccessor={'count'}
-        // lines={[{ title: 'Monthly Activity', coordinates: this.state.userData }]}
-        // lineStyle={d => ({ stroke: d.color, fill: d.color })}
-        // {...frameProps}
-        />
-
 
 
       </div >

@@ -3,8 +3,11 @@ const axios = require("axios");
 const moment = require("moment");
 const path = require("path");
 
+let currentDate = moment().format('YYYY-MM-DD');
+let colors = ['darkblue', 'darkred', 'darkgreen', 'cyan', 'purple', 'teal', 'lightblue', 'grey'];
 
 router.get("/user/:userName", function (req, res) {
+
 
     axios.get(`https://github-contributions-api.now.sh/v1/${req.params.userName}`)
         .then(user => {
@@ -12,7 +15,6 @@ router.get("/user/:userName", function (req, res) {
             // Now we want to split the data from weekly, monthly, and yearly
 
             // Here we have the current date
-            let currentDate = moment().format('YYYY-MM-DD');
             let todayContributions = [];
             let weeklyContributions = [];
             let monthlyContributions = [];
@@ -59,6 +61,64 @@ router.get("/user/:userName", function (req, res) {
 
             res.json(userData)
         })
+})
+
+router.post("/user", function (req, res) {
+    let users = req.body.users
+    console.log(users)
+    let userData = []
+    console.log(`\n`, users)
+    for (let i = 0; i < users.length; i++) {
+        axios.get(`https://github-contributions-api.now.sh/v1/${users[i]}`)
+            .then(user => {
+
+                // Format Data to day count
+                let monthlyContributions = [];
+                let thisMonth = currentDate.slice(0, 7);
+
+                // Iterate through list of contributions
+                for (let i = 0; i < user.data.contributions.length; i++) {
+                    let monthDate = user.data.contributions[i].date.slice(0, 7)
+                    // let todayDate = user.data.contributions[i].date
+
+                    // If the month is equal to this month of this year
+                    if (monthDate == thisMonth) {
+                        let thisDate = {
+                            date: parseInt(moment(user.data.contributions[i].date).date()),
+                            count: parseInt(user.data.contributions[i].count)
+                        }
+                        console.log(thisDate)
+                        monthlyContributions.push(thisDate)
+                    }
+                }
+
+                // This is our user, we want to push this formatted version of the data recieved to our userData array
+                let newUser = {
+                    author: users[i],
+                    color: colors[i],
+                    monthly: monthlyContributions
+                }
+
+                console.log(newUser)
+
+                userData.push(newUser)
+
+                // At the end of the loop. Scaled to include more users
+                if (i === users.length - 1) {
+                    console.log("End Loop")
+                    let returnData = {
+                        users: userData
+                    }
+
+                    console.log("Return Data")
+                    console.log(returnData)
+                    res.json(returnData)
+                }
+            })
+
+    }
+
+
 })
 
 router.use(function (req, res) {
