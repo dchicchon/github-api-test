@@ -177,7 +177,7 @@ class App extends Component {
             >
               <VictoryAxis
                 axisLabelComponent={<VictoryLabel />}
-                label={'Days this month'}
+                label={this.state.dataFormat}
                 style={{
                   axisLabel: { fontSize: 7 },
                   grid: { stroke: 'lightgrey' },
@@ -201,7 +201,7 @@ class App extends Component {
                 y={50}
                 title='Legend'
                 centerTitle
-                orientation='vertical'
+                orientation='horizontal'
                 gutter={20}
                 itemsPerRow={4}
                 // borderPadding={0}

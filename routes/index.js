@@ -89,6 +89,9 @@ router.post("/user", function (req, res) {
                 let yearlyContributions = [];
                 let thisMonth = currentDate.slice(0, 7);
 
+                let monthNow = 0;
+                let monthSum = 0;
+                // let endOfMonth = moment(userDate)
                 // Iterate through list of contributions
                 for (let i = 0; i < user.data.contributions.length; i++) {
                     let userDate = user.data.contributions[i].date
@@ -116,7 +119,32 @@ router.post("/user", function (req, res) {
                     }
 
                     // YEARLY FILTER
+                    // Lets have a for loop to count the number of commits per week
                     if (moment(userDate).weekYear() === currentYear) {
+
+                        monthSum += user.data.contributions[i].count
+                        console.log(monthSum)
+
+
+
+                        // Now I want to split all the dates into separate weeks
+                        // while (weekNow < 52) {
+
+                        //     if (moment(currentDate).day() === 7) {
+                        //         weekNow++
+                        //     }
+                        // }
+                        // let monthSum = 0;
+
+                        // console.log(user.data.contributions[i].count)
+
+                        // if (moment(currentDate).month() === currentMonth) {
+                        //     monthSum += parseInt(user.data.contributions[i].count)
+                        //     console.log(userDate, user.data.contributions[i].count)
+                        //     console.log(monthSum)
+
+                        // }
+
                         let thisDate = {
                             date: parseInt(moment(user.data.contributions[i].date).dayOfYear()),
                             count: parseInt(user.data.contributions[i].count)
