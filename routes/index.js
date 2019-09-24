@@ -6,62 +6,62 @@ const path = require("path");
 let currentDate = moment().format('YYYY-MM-DD');
 let colors = ['darkblue', 'darkred', 'darkgreen', 'cyan', 'purple', 'teal', 'lightblue', 'grey'];
 
-router.get("/user/:userName", function (req, res) {
+// router.get("/user/:userName", function (req, res) {
 
 
-    axios.get(`https://github-contributions-api.now.sh/v1/${req.params.userName}`)
-        .then(user => {
-            // console.log(user.data)
-            // Now we want to split the data from weekly, monthly, and yearly
+//     axios.get(`https://github-contributions-api.now.sh/v1/${req.params.userName}`)
+//         .then(user => {
+//             // console.log(user.data)
+//             // Now we want to split the data from weekly, monthly, and yearly
 
-            // Here we have the current date
-            let todayContributions = [];
-            let weeklyContributions = [];
-            let monthlyContributions = [];
-            let yearlyContributions = [];
-
-
-            // Today's data
-
-            // Get the data for this week
-
-            // Get the data for this month
-            let thisMonth = currentDate.slice(0, 7)
-            for (let i = 0; i < user.data.contributions.length; i++) {
-                let monthDate = user.data.contributions[i].date.slice(0, 7)
-                let todayDate = user.data.contributions[i].date
-
-                if (monthDate == thisMonth) {
-                    let thisDate = {
-                        date: parseInt(moment(user.data.contributions[i].date).date()),
-                        count: parseInt(user.data.contributions[i].count)
-                    }
-                    console.log(thisDate)
-                    monthlyContributions.push(thisDate)
-                }
-                if (todayDate === currentDate) {
-                    console.log(user.data.contributions[i])
-                    let today = {
-                        date: moment(user.data.contributions[i].date),
-                        count: parseInt(user.data.contributions[i].count)
-                    }
-                    todayContributions.push(today)
-                }
-            }
+//             // Here we have the current date
+//             let todayContributions = [];
+//             let weeklyContributions = [];
+//             let monthlyContributions = [];
+//             let yearlyContributions = [];
 
 
-            let userData = {
-                today: todayContributions,
-                weekly: '',
-                monthly: monthlyContributions,
-                yearly: ''
-            }
-            console.log(userData)
+//             // Today's data
+
+//             // Get the data for this week
+
+//             // Get the data for this month
+//             let thisMonth = currentDate.slice(0, 7)
+//             for (let i = 0; i < user.data.contributions.length; i++) {
+//                 let monthDate = user.data.contributions[i].date.slice(0, 7)
+//                 let todayDate = user.data.contributions[i].date
+
+//                 if (monthDate == thisMonth) {
+//                     let thisDate = {
+//                         date: parseInt(moment(user.data.contributions[i].date).date()),
+//                         count: parseInt(user.data.contributions[i].count)
+//                     }
+//                     console.log(thisDate)
+//                     monthlyContributions.push(thisDate)
+//                 }
+//                 if (todayDate === currentDate) {
+//                     console.log(user.data.contributions[i])
+//                     let today = {
+//                         date: moment(user.data.contributions[i].date),
+//                         count: parseInt(user.data.contributions[i].count)
+//                     }
+//                     todayContributions.push(today)
+//                 }
+//             }
 
 
-            res.json(userData)
-        })
-})
+//             let userData = {
+//                 today: todayContributions,
+//                 weekly: '',
+//                 monthly: monthlyContributions,
+//                 yearly: ''
+//             }
+//             console.log(userData)
+
+
+//             res.json(userData)
+//         })
+// })
 
 router.post("/user", function (req, res) {
     let users = req.body.users
@@ -99,18 +99,20 @@ router.post("/user", function (req, res) {
                     monthly: monthlyContributions
                 }
 
-                console.log(newUser)
+                console.log("\n", newUser)
 
                 userData.push(newUser)
 
                 // At the end of the loop. Scaled to include more users
-                if (i === users.length - 1) {
-                    console.log("End Loop")
+                // Need an async/await function here!
+                if (userData.length === users.length) {
+                    console.log("\nEnd Loop")
+
                     let returnData = {
                         users: userData
                     }
 
-                    console.log("Return Data")
+                    console.log("Return Data\n")
                     console.log(returnData)
                     res.json(returnData)
                 }

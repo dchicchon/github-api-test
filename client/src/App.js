@@ -76,7 +76,11 @@ class App extends Component {
     let userArr = document.getElementsByClassName("user")
     let names = [];
     for (let i = 0; i < userArr.length; i++) {
-      names.push(userArr[i].value)
+      console.log(userArr[i])
+      if (userArr[i] !== '') {
+        console.log("made it")
+        names.push(userArr[i].value)
+      }
     }
 
     let data = {
@@ -116,37 +120,41 @@ class App extends Component {
   render() {
 
     return (
-      <div className='container'>
-        <h4>Contribution Line Graph</h4>
+      <div>
 
-        {/* I want to have a plus button below this input to add additional users */}
-        <div className='input-section'>
-          {/* <div className='input-field col s6'>
+        <div className='container'>
+          <h4>Contribution Line Graph</h4>
+
+          {/* I want to have a plus button below this input to add additional users */}
+          <div className='input-section'>
+            {/* <div className='input-field col s6'>
             <input id='user' name='user' value={this.state.user} onChange={this.handleInputChange} type='text' className='validate'></input>
             <label htmlFor='user'>User</label>
           </div> */}
 
-          {this.state.numUsers.length ?
+            {this.state.numUsers.length ?
 
-            this.state.numUsers.map((elm, i) => (
-              <NewInput
-                key={i}
-              />
-            ))
-            : ''}
+              this.state.numUsers.map((elm, i) => (
+                <NewInput
+                  key={i}
+                />
+              ))
+              : ''}
 
 
-          {/* Here we want to add more inputs based on the numUsers state */}
+            {/* Here we want to add more inputs based on the numUsers state */}
 
+          </div>
+          <button className='btn' onClick={this.multSubmit}>Submit</button><button className='btn' onClick={this.addUser}>Add User</button>
         </div>
-        <button className='btn' onClick={this.multSubmit}>Submit</button><button className='btn' onClick={this.addUser}>Add User</button>
 
         {this.state.userData2.length ?
           <div>
             <VictoryChart
-              height={300}
+              // height={250}
               width={550}
-              domainPadding={{ y: 10 }}
+              domainPadding={{ y: 30 }}
+              padding={50}
             >
               <VictoryLegend
                 // x={30}
@@ -155,8 +163,10 @@ class App extends Component {
                 centerTitle
                 orientation='horizontal'
                 gutter={20}
-                style={{ border: { stroke: 'black' }, title: { fontSize: 10 }, data: { fontSize: 10 } }}
+                itemsPerRow={4}
+                style={{ border: { stroke: 'black' }, title: { fontSize: 10 }, labels: { fontSize: 8 } }}
                 data={this.state.userLegend}
+                height={100}
               />
               {this.state.userData2.map(
                 (user, i) => (
