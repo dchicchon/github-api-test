@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 // Victory
 // import * as V from 'victory';
-import { VictoryChart, VictoryLine, VictoryTheme, VictoryVoronoiContainer, VictoryLegend } from 'victory';
+import { VictoryChart, VictoryLine, VictoryContainer, VictoryVoronoiContainer, VictoryAxis, VictoryLabel, VictoryLegend } from 'victory';
 
 // import moment, { duration } from 'moment';
 import API from './Utils/API';
@@ -16,7 +16,7 @@ class App extends Component {
     // userData: [],
     userData2: [],
     userLabels: [],
-    dataFormat: 'weekly',
+    dataFormat: 'monthly',
     avgCommits: '',
 
     userLegend: []
@@ -117,6 +117,25 @@ class App extends Component {
     })
   }
 
+  changeFormat = event => {
+    event.preventDefault();
+    const { id } = event.target
+    this.setState({
+      dataFormat: id
+    })
+  }
+
+  renderSwitch(param) {
+    switch (param) {
+      case 'weekly':
+        return this.state.userData2
+      case 'montly':
+        return this.state.userData2
+      case 'yearly':
+        return this.state.userData2
+    }
+  }
+
   render() {
 
     return (
@@ -151,30 +170,55 @@ class App extends Component {
         {this.state.userData2.length ?
           <div>
             <VictoryChart
-              // height={250}
-              width={550}
-              domainPadding={{ y: 30 }}
+              // height={650}
+              // width={1300}
+              domainPadding={{ y: 20 }}
               padding={50}
             >
+              <VictoryAxis
+                axisLabelComponent={<VictoryLabel />}
+                label={'Days this month'}
+                style={{
+                  axisLabel: { fontSize: 7 },
+                  grid: { stroke: 'lightgrey' },
+                  tickLabels: { fontSize: 5 }
+                }}
+              />
+              <VictoryAxis
+                dependentAxis={true}
+                axisLabelComponent={<VictoryLabel />}
+                label={'Number of Commits'}
+                style={{
+                  axisLabel: { fontSize: 7 },
+                  grid: { stroke: 'lightgrey' },
+                  tickLabels: { fontSize: 5 }
+
+                }}
+
+              />
               <VictoryLegend
-                // x={30}
-                // y={30}
+                x={150}
+                y={50}
                 title='Legend'
                 centerTitle
-                orientation='horizontal'
+                orientation='vertical'
                 gutter={20}
                 itemsPerRow={4}
-                style={{ border: { stroke: 'black' }, title: { fontSize: 10 }, labels: { fontSize: 8 } }}
+                // borderPadding={0}
+                style={{ border: { stroke: 'black' }, title: { fontSize: 7 }, labels: { fontSize: 5 }, names: { fontSize: 5 } }}
                 data={this.state.userLegend}
-                height={100}
+                height={10}
               />
+
               {this.state.userData2.map(
                 (user, i) => (
                   <VictoryLine
                     interpolation='natural'
                     name={user.author}
                     key={i}
-                    data={user.monthly}
+                    // data={user.monthly}
+                    data={user[`${this.state.dataFormat}`]}
+                    // data={this.state.dataFormat === 'monthly' ? user.monthly : '' || this.state.dataFormat === 'weekly' ? user.weekly : '' || this.state.dataFormat === 'yearly' ? user.yearly : ''}
                     style={{
                       data: { stroke: user.color, strokeWidth: 0.8 }
                     }}
@@ -185,6 +229,7 @@ class App extends Component {
                 )
               )}
             </VictoryChart>
+            <button type='button' id='weekly' className='btn' onClick={this.changeFormat}>Weekly</button><button type='button' id='monthly' className='btn' onClick={this.changeFormat}>Monthly</button><button type='button' id='yearly' className='btn' onClick={this.changeFormat}>Yearly</button>
           </div>
           : ''}
 
